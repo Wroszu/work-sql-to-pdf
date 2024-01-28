@@ -4,30 +4,29 @@ Connects to a SQL database using pyodbc
 
 import pyodbc
 
-SERVER = '<server-address>'
-DATABASE = '<database-name>'
-USERNAME = '<username>'
-PASSWORD = '<password>'
+SERVER = '127.0.0.1'
+DATABASE = 'master'
+USERNAME = 'wroszu'
+PASSWORD = 'kvgyzqkQ1!'
 
-connectionString = f'DRIVER={{ODBC Driver 18 for MySQL}};
-                    SERVER={SERVER};
-                    DATABASE={DATABASE};
-                    UID={USERNAME};
-                    PWD={PASSWORD}'
+conn = pyodbc.connect('Driver={ODBC Driver 18 for SQL Server};'
+                      f'Server={SERVER};'
+                      f'Database={DATABASE};'
+                      f'UID={USERNAME};'
+                      f'PWD={PASSWORD};'
+                      'TrustServerCertificate=yes;')
 
-conn = pyodbc.connect(connectionString)
-
-dds = """
-DROP DATABASE IF EXISTS `sql_hr`;
-CREATE DATABASE `sql_hr`;
-USE `sql_hr`;
+SQL_QUERY = """
+DROP DATABASE IF EXISTS sql_hr;
+CREATE DATABASE sql_hr;
+USE sql_hr;
 
 
-CREATE TABLE `offices` (
-  `office_id` int(11) NOT NULL,
-  `address` varchar(50) NOT NULL,
-  `city` varchar(50) NOT NULL,
-  `state` varchar(50) NOT NULL,
+CREATE TABLE offices (
+  office_id int(11) NOT NULL,
+  address varchar(50) NOT NULL,
+  city varchar(50) NOT NULL,
+  state varchar(50) NOT NULL,
   PRIMARY KEY (`office_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 INSERT INTO `offices` VALUES (1,'03 Reinke Trail','Cincinnati','OH');
@@ -77,11 +76,15 @@ INSERT INTO `employees` VALUES (95213,'Cole','Kesterton','Pharmacist',86119,3727
 INSERT INTO `employees` VALUES (96513,'Theresa','Binney','Food Chemist',47354,37270,5);
 INSERT INTO `employees` VALUES (98374,'Estrellita','Daleman','Staff Accountant IV',70187,37270,5);
 INSERT INTO `employees` VALUES (115357,'Ivy','Fearey','Structural Engineer',92710,37270,5);
+
+
+
+
 """
 
 cursor = conn.cursor()
-cursor.execute(dds)
+cursor.execute(SQL_QUERY)
 
 records = cursor.fetchall()
 for r in records:
-    print(f"{r.office_id}\t{r.address}")
+    print(f"{r.CustomerID}\t{r.OrderCount}\t{r.CompanyName}")
