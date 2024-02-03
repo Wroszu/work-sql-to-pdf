@@ -1,0 +1,9 @@
+ 
+systemctl status mssql-server --no-pager
+
+sqlcmd -C -S localhost -U wroszu
+
+SELECT name, database_id, create_date
+FROM sys.databases;
+GO
+
