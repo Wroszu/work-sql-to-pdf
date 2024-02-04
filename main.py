@@ -1,6 +1,29 @@
 import sqlite3
 import pandas as pd
 import numpy as np
+import datetime
+from reportlab.platypus import Frame, PageTemplate, BaseDocTemplate, Table, Paragraph
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4, landscape
+
+dt = datetime.datetime.now()
+
+def on_page(canvas, doc, pagesize=A4):
+    page_num = canvas.getPageNumber()
+    canvas.drawString(20, 20, dt.strftime("%d/%m/%Y  %H:%M:%S"))
+    canvas.drawCentredString(pagesize[0]/2, 20, str(page_num))
+    canvas.drawImage('/home/wroszu/GitHub/work-sql-to-pdf/see-more-sprite.png', 10, 740)
+
+def df2table(df):
+    return Table(
+      [[Paragraph(col) for col in df.columns]] + df.values.tolist(), 
+      style=[
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('LINEBELOW',(0,0), (-1,0), 1, colors.black),
+        ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+        ('BOX', (0,0), (-1,-1), 1, colors.black),
+        ('ROWBACKGROUNDS', (0,0), (-1,-1), [colors.lightgrey, colors.white])],
+      hAlign = 'LEFT')
 
 conn = sqlite3.connect('/home/wroszu/GitHub/work-sql-to-pdf/sql_files/sqlite-sakila.db')
 
@@ -68,9 +91,10 @@ for table_categories in Raw_categories_list:
     temp = table_categories.split(',')
     Categories_list.append(temp)
 
-cursor.execute("SELECT * FROM payment")
-rows = cursor.fetchall()
+Table_number = int(input("Enter number of table You want to export to PDF file:"))
 
+cursor.execute("SELECT * FROM "+str(Tables_list[Table_number]))
+rows = cursor.fetchall()
 
 temp_data_list = []
 for row in rows:
@@ -79,9 +103,19 @@ for row in rows:
     temp = row.split(',')
     temp_data_list.append(temp)
 
-df = pd.DataFrame(np.array(temp_data_list), columns=Categories_list[0])
-
-print(df.head(10))
-
 conn.close()
 
+df = pd.DataFrame(np.array(temp_data_list), columns=Categories_list[Table_number])
+
+padding = dict(leftPadding = 20, rightPadding = 20, topPadding = 72, bottomPadding = 40)
+
+portrait_frame = Frame (0, 0, *A4, **padding)
+landscape_frame = Frame (0, 0, *landscape(A4), **padding)
+
+portrait_template = PageTemplate(id='portrait', frames=portrait_frame,onPage=on_page, pagesize=A4)
+
+PDF_file_name = str(input("Enter PDF file name (DO NOT USE SPACES!):"))
+
+doc = BaseDocTemplate(PDF_file_name+'.pdf', pageTemplates=portrait_template)
+
+doc.build([df2table(df)])
