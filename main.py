@@ -1,3 +1,4 @@
+import os
 import sqlite3
 import pandas as pd
 import numpy as np
@@ -7,12 +8,15 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
 
 dt = datetime.datetime.now()
+sql_files_directory = os.path.join(os.path.dirname(__file__), 'sql_files')
+sqlite_db_path = os.path.join(sql_files_directory, 'sqlite-sakila.db')
+elprof_logo_path = os.path.join(os.path.dirname(__file__), 'see-more-sprite.png')
 
 def on_page(canvas, doc, pagesize=A4):
     page_num = canvas.getPageNumber()
     canvas.drawString(20, 20, dt.strftime("%d/%m/%Y  %H:%M:%S"))
     canvas.drawCentredString(pagesize[0]/2, 20, str(page_num))
-    canvas.drawImage('/home/wroszu/GitHub/work-sql-to-pdf/see-more-sprite.png', 10, 740)
+    canvas.drawImage(elprof_logo_path, 10, 740)
 
 def df2table(df):
     return Table(
@@ -25,7 +29,7 @@ def df2table(df):
         ('ROWBACKGROUNDS', (0,0), (-1,-1), [colors.lightgrey, colors.white])],
       hAlign = 'LEFT')
 
-conn = sqlite3.connect('/home/wroszu/GitHub/work-sql-to-pdf/sql_files/sqlite-sakila.db')
+conn = sqlite3.connect(sqlite_db_path)
 
 cursor = conn.cursor()
 
@@ -91,7 +95,8 @@ for table_categories in Raw_categories_list:
     temp = table_categories.split(',')
     Categories_list.append(temp)
 
-Table_number = int(input("Enter number of table You want to export to PDF file:"))
+#Table_number = int(input("Enter number of table You want to export to PDF file:"))
+Table_number = 2 #for Docker test
 
 cursor.execute("SELECT * FROM "+str(Tables_list[Table_number]))
 rows = cursor.fetchall()
@@ -114,7 +119,8 @@ landscape_frame = Frame (0, 0, *landscape(A4), **padding)
 
 portrait_template = PageTemplate(id='portrait', frames=portrait_frame,onPage=on_page, pagesize=A4)
 
-PDF_file_name = str(input("Enter PDF file name (DO NOT USE SPACES!):"))
+#PDF_file_name = str(input("Enter PDF file name (DO NOT USE SPACES!):"))
+PDF_file_name = 'test_file' #for Docker test 
 
 doc = BaseDocTemplate(PDF_file_name+'.pdf', pageTemplates=portrait_template)
 
