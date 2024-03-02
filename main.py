@@ -95,8 +95,8 @@ for table_categories in Raw_categories_list:
     temp = table_categories.split(',')
     Categories_list.append(temp)
 
-#Table_number = int(input("Enter number of table You want to export to PDF file:"))
-Table_number = 2 #for Docker test
+Table_number = int(input("Enter number of table You want to export to PDF file:"))
+#Table_number = 2 #for Docker test
 
 cursor.execute("SELECT * FROM "+str(Tables_list[Table_number]))
 rows = cursor.fetchall()
@@ -119,8 +119,8 @@ landscape_frame = Frame (0, 0, *landscape(A4), **padding)
 
 portrait_template = PageTemplate(id='portrait', frames=portrait_frame,onPage=on_page, pagesize=A4)
 
-#PDF_file_name = str(input("Enter PDF file name (DO NOT USE SPACES!):"))
-PDF_file_name = 'test_file' #for Docker test 
+PDF_file_name = str(input("Enter PDF file name (DO NOT USE SPACES!):"))
+#PDF_file_name = 'test_file' #for Docker test 
 
 doc = BaseDocTemplate(PDF_file_name+'.pdf', pageTemplates=portrait_template)
 
