@@ -7,9 +7,9 @@ server = 'Asus-PC'
 database = 'PEC_ENERGA2' 
 username = 'wroszu' 
 password = 'kvgyzqkQ1!'  
-cnxn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password)
+cnxn = pyodbc.connect('DRIVER={{ODBC Driver 18 for SQL Server}};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password)
 cursor = cnxn.cursor()
 # select 26 rows from SQL table to insert in dataframe.
-query = "SELECT [CountryRegionCode], [Name] FROM Person.CountryRegion;"
+query = "SELECT TOP (1000) [Urzadzenie] FROM [PEC_ENERGA2].[dbo].[modbus]"
 df = pd.read_sql(query, cnxn)
 print(df.head(26))
